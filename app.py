@@ -18,10 +18,14 @@ def home():
 
 @app.route('/test_db')
 def test_db():
-    cur = mysql.connection.cursor()
-    cur.execute("SHOW TABLES;")  # Check if we can access the database
-    result = cur.fetchall()
-    return str(result)
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("USE mentorship_db;")  # Ensure correct database is selected
+        cur.execute("SHOW TABLES;")  # List tables
+        result = cur.fetchall()
+        return f"Tables: {result}" if result else "No tables found."
+    except Exception as e:
+        return f"Database error: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True)
