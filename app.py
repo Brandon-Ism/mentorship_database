@@ -16,7 +16,7 @@ mysql = MySQL(app)
 
     
 # Upload settings
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = 'static/uploads/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -25,9 +25,6 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
     
 
-@app.route('/')
-def home():
-    return "Mentorship & Research Collaboration Database is running!"
 
 @app.route('/test_db')
 def test_db():
@@ -44,6 +41,29 @@ def test_db():
 def allowed_file(filename):
     """Check if the uploaded file is an allowed type."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/')
+def home():
+    cur = mysql.connection.cursor()
+
+    # Fetch all user profiles
+    cur.execute("""
+        SELECT u.id, u.name, u.academic_position, u.institution, u.department, 
+               u.bio, u.interested_in, u.headshot_path 
+        FROM users u 
+        ORDER BY u.name ASC
+    """)
+    profiles = cur.fetchall()
+
+    cur.close()
+    return render_template('home.html', profiles=profiles)
+
+from flask import send_from_directory
+
+@app.route('/static/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 
 @app.route('/create_profile', methods=['GET', 'POST'])
