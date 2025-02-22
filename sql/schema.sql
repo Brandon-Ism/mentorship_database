@@ -12,7 +12,8 @@ CREATE TABLE users (
     institution VARCHAR(255),
     department VARCHAR(255),
     bio TEXT,
-    interested_in SET('Collaboration', 'Providing Mentorship', 'Receiving Mentorship', 'N/A') NOT NULL
+    interested_in SET('Collaboration', 'Providing Mentorship', 'Receiving Mentorship', 'N/A') NOT NULL,
+    headshot_path VARCHAR(255) DEFAULT 'static/uploads/default.jpg' -- Stores path to image
 );
 
 -- Research Interests Table (Predefined + User-Added)

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Profile</title>
+</head>
+<body>
+    <h2>Create a New Profile</h2>
+    <form action="{{ url_for('create_profile') }}" method="post" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" name="name" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" required><br>
+
+        <label for="academic_position">Position:</label>
+        <select name="academic_position">
+            <option value="Undergraduate">Undergraduate</option>
+            <option value="Graduate Student">Graduate Student</option>
+            <option value="Postdoc">Postdoc</option>
+            <option value="Faculty">Faculty</option>
+            <option value="Industry">Industry</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <label for="institution">Institution:</label>
+        <input type="text" name="institution"><br>
+
+        <label for="department">Department:</label>
+        <input type="text" name="department"><br>
+
+        <label for="bio">Bio:</label>
+        <textarea name="bio"></textarea><br>
+
+        <label for="interested_in">Interested In:</label>
+        <select name="interested_in" multiple>
+            <option value="Collaboration">Collaboration</option>
+            <option value="Providing Mentorship">Providing Mentorship</option>
+            <option value="Receiving Mentorship">Receiving Mentorship</option>
+            <option value="N/A">N/A</option>
+        </select><br>
+
+        <label for="headshot">Upload Profile Picture:</label>
+        <input type="file" name="headshot" accept=".png, .jpg, .jpeg, .gif"><br>
+
+        <h3>Select Up to 5 Research Interests</h3>
+        {% for interest in research_interests %}
+            <input type="checkbox" name="research_interests" value="{{ interest[0] }}"> {{ interest[1] }}<br>
+        {% endfor %}
+
+        <label for="new_research_interest">Or Add a New Research Interest:</label>
+        <input type="text" name="new_research_interest"><br>
+
+        <input type="submit" value="Create Profile">
+    </form>
+</body>
+</html>
