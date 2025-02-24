@@ -1,4 +1,4 @@
-#!/home/brandon/Documents/mentorship_database/ubu_venv/bin/python3
+#!/home/brandon/Documents/mentorship_database/ubu_venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
