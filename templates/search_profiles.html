@@ -38,6 +38,20 @@
             margin-bottom: 20px;
         }
     </style>
+    <script>
+        function toggleSearchOptions() {
+            const searchType = document.querySelector('input[name="search_type"]:checked').value;
+            document.getElementById('queryInput').style.display = (searchType === 'position' || searchType === 'interested_in') ? 'none' : 'block';
+            document.getElementById('positionOptions').style.display = (searchType === 'position') ? 'block' : 'none';
+            document.getElementById('interestedOptions').style.display = (searchType === 'interested_in') ? 'block' : 'none';
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            const radios = document.querySelectorAll('input[name="search_type"]');
+            radios.forEach(radio => radio.addEventListener('change', toggleSearchOptions));
+            toggleSearchOptions();
+        });
+    </script>
 </head>
 <body>
     <h2>Search Mentorship & Research Profiles</h2>
@@ -53,10 +67,29 @@
             <input type="radio" name="search_type" value="interests"> Research Interests
         </div>
 
-        <div class="search-section">
-            <input type="text" name="query" value="{{ query }}" placeholder="Enter keyword..." required>
-            <input type="submit" value="Search" class="search-button">
+        <div class="search-section" id="queryInput">
+            <input type="text" name="query" value="{{ query }}" placeholder="Enter keyword...">
         </div>
+
+        <div class="search-section" id="positionOptions" style="display:none">
+            <label><strong>Select one or more positions:</strong></label><br>
+            <input type="checkbox" name="query" value="Undergraduate"> Undergraduate<br>
+            <input type="checkbox" name="query" value="Graduate Student"> Graduate Student<br>
+            <input type="checkbox" name="query" value="Postdoc"> Postdoc<br>
+            <input type="checkbox" name="query" value="Faculty"> Faculty<br>
+            <input type="checkbox" name="query" value="Industry"> Industry<br>
+            <input type="checkbox" name="query" value="Other"> Other<br>
+        </div>
+
+        <div class="search-section" id="interestedOptions" style="display:none">
+            <label><strong>Select one or more interest types:</strong></label><br>
+            <input type="checkbox" name="query" value="Collaboration"> Collaboration<br>
+            <input type="checkbox" name="query" value="Providing Mentorship"> Providing Mentorship<br>
+            <input type="checkbox" name="query" value="Receiving Mentorship"> Receiving Mentorship<br>
+            <input type="checkbox" name="query" value="N/A"> N/A<br>
+        </div>
+
+        <input type="submit" value="Search" class="search-button">
     </form>
 
     {% if profiles %}
