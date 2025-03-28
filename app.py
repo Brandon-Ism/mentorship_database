@@ -145,6 +145,95 @@ def create_profile():
 
 
 
+@app.route('/update_profile', methods=['GET', 'POST'])
+def update_profile():
+    cur = mysql.connection.cursor()
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+
+        # Find user by email
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()
+
+        if not user:
+            cur.close()
+            return render_template('update_profile.html', error="No profile found for that email.")
+
+        # Fetch research interests for this user
+        cur.execute("""
+            SELECT interest_id FROM user_research_interests WHERE user_id = %s
+        """, (user[0],))
+        selected_interests = [row[0] for row in cur.fetchall()]
+
+        # Fetch all available interests
+        cur.execute("SELECT id, name FROM research_interests ORDER BY name ASC")
+        all_interests = cur.fetchall()
+
+        cur.close()
+
+        return render_template('edit_profile.html', user=user, selected_interests=selected_interests, research_interests=all_interests)
+
+    return render_template('update_profile.html')
+
+
+# Handle profile update POST request
+@app.route('/edit_profile/<int:user_id>', methods=['POST'])
+def edit_profile(user_id):
+    cur = mysql.connection.cursor()
+
+    name = request.form.get('name')
+    academic_position = request.form.get('academic_position')
+    institution = request.form.get('institution')
+    department = request.form.get('department')
+    bio = request.form.get('bio')
+    interested_in = request.form.getlist('interested_in')
+    interested_in_str = ",".join(interested_in) if interested_in else "N/A"
+
+    # Handle file upload
+    file = request.files.get('headshot')
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        headshot_path = file_path
+        cur.execute("""
+            UPDATE users SET name=%s, academic_position=%s, institution=%s, 
+            department=%s, bio=%s, interested_in=%s, headshot_path=%s 
+            WHERE id=%s
+        """, (name, academic_position, institution, department, bio, interested_in_str, headshot_path, user_id))
+    else:
+        cur.execute("""
+            UPDATE users SET name=%s, academic_position=%s, institution=%s, 
+            department=%s, bio=%s, interested_in=%s 
+            WHERE id=%s
+        """, (name, academic_position, institution, department, bio, interested_in_str, user_id))
+
+    mysql.connection.commit()
+
+    # Update research interests
+    cur.execute("DELETE FROM user_research_interests WHERE user_id = %s", (user_id,))
+    selected_interests = request.form.getlist('research_interests')
+    new_interest_input = request.form.get('new_research_interest')
+
+    if new_interest_input:
+        new_interests = [s.strip() for s in new_interest_input.split(',') if s.strip()]
+        for interest in new_interests:
+            cur.execute("INSERT IGNORE INTO research_interests (name) VALUES (%s)", (interest,))
+            mysql.connection.commit()
+            cur.execute("SELECT id FROM research_interests WHERE name = %s", (interest,))
+            new_interest_id = cur.fetchone()[0]
+            selected_interests.append(str(new_interest_id))
+
+    for interest_id in set(selected_interests):
+        cur.execute("INSERT IGNORE INTO user_research_interests (user_id, interest_id) VALUES (%s, %s)", (user_id, interest_id))
+
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('home'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

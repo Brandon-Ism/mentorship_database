@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+</head>
+<body>
+    <h2>Edit Your Profile</h2>
+    <form action="{{ url_for('edit_profile', user_id=user[0]) }}" method="post" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" name="name" value="{{ user[1] }}" required><br>
+
+        <label for="email">Email (cannot be changed):</label>
+        <input type="email" name="email" value="{{ user[2] }}" readonly><br>
+
+        <label for="academic_position">Position:</label>
+        <input type="text" name="academic_position" value="{{ user[3] }}"><br>
+
+        <label for="institution">Institution:</label>
+        <input type="text" name="institution" value="{{ user[4] }}"><br>
+
+        <label for="department">Department:</label>
+        <input type="text" name="department" value="{{ user[5] }}"><br>
+
+        <label for="bio">Bio:</label>
+        <textarea name="bio">{{ user[6] }}</textarea><br>
+
+        <label for="interested_in">Interested In:</label>
+        <select name="interested_in" multiple required>
+            <option value="Collaboration" {% if 'Collaboration' in user[7] %}selected{% endif %}>Collaboration</option>
+            <option value="Providing Mentorship" {% if 'Providing Mentorship' in user[7] %}selected{% endif %}>Providing Mentorship</option>
+            <option value="Receiving Mentorship" {% if 'Receiving Mentorship' in user[7] %}selected{% endif %}>Receiving Mentorship</option>
+        </select><br>
+
+        <label for="headshot">Update Profile Picture:</label>
+        <input type="file" name="headshot" accept=".png, .jpg, .jpeg, .gif"><br>
+
+        <h3>Select Up to 5 Research Interests</h3>
+        {% for interest in research_interests %}
+            <input type="checkbox" name="research_interests" value="{{ interest[0] }}" {% if interest[0] in selected_interests %}checked{% endif %}> {{ interest[1] }}<br>
+        {% endfor %}
+
+        <label for="new_research_interest">Or Add New Interests (comma-separated):</label>
+        <input type="text" name="new_research_interest"><br>
+
+        <input type="submit" value="Update Profile">
+    </form>
+
+    <p><a href="{{ url_for('home') }}">Back to Home</a></p>
+</body>
+</html>
