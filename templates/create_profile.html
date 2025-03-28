@@ -43,7 +43,7 @@
         <label for="headshot">Upload Profile Picture:</label>
         <input type="file" name="headshot" accept=".png, .jpg, .jpeg, .gif"><br>
 
-        <h3>Select Up to 5 Research Interests</h3>
+        <h3>Select Up to 5 Field/Research Interests</h3>
         {% for interest in research_interests %}
             <input type="checkbox" name="research_interests" value="{{ interest[0] }}"> {{ interest[1] }}<br>
         {% endfor %}

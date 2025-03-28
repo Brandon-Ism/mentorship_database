@@ -42,20 +42,29 @@ def allowed_file(filename):
     """Check if the uploaded file is an allowed type."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Update to homepage route to support sorting by name, institution, or interested_in
+
 @app.route('/')
 def home():
+    sort_by = request.args.get('sort_by', 'name')
+    valid_sort_columns = {
+        'name': 'u.name',
+        'institution': 'u.institution',
+        'interested_in': 'u.interested_in'
+    }
+
+    order_clause = valid_sort_columns.get(sort_by, 'u.name')
+
     cur = mysql.connection.cursor()
 
-    # Fetch user info
-    cur.execute("""
-        SELECT u.id, u.name, u.academic_position, u.institution, u.department, 
+    cur.execute(f"""
+        SELECT u.id, u.name, u.email, u.academic_position, u.institution, u.department,
                u.bio, u.interested_in, u.headshot_path
-        FROM users u 
-        ORDER BY u.name ASC
+        FROM users u
+        ORDER BY {order_clause} ASC
     """)
     users = cur.fetchall()
 
-    # Fetch all research interests for users
     user_interests = {}
     for user in users:
         user_id = user[0]
@@ -64,11 +73,10 @@ def home():
             JOIN user_research_interests uri ON ri.id = uri.interest_id
             WHERE uri.user_id = %s
         """, (user_id,))
-        interests = [row[0] for row in cur.fetchall()]
-        user_interests[user_id] = interests
+        user_interests[user_id] = [row[0] for row in cur.fetchall()]
 
     cur.close()
-    return render_template('home.html', profiles=users, user_interests=user_interests)
+    return render_template('home.html', profiles=users, user_interests=user_interests, sort_by=sort_by)
 
 
 from flask import send_from_directory
