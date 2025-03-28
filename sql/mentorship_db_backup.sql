@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS mentorship_db;
+USE mentorship_db;
+
+
 -- MySQL dump 10.13  Distrib 8.0.41, for Linux (x86_64)
 --
 -- Host: localhost    Database: mentorship_db
