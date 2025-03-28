@@ -236,6 +236,105 @@ def edit_profile(user_id):
 
     return redirect(url_for('home'))
 
+# Delete_profile route
+@app.route('/delete_profile', methods=['GET', 'POST'])
+def delete_profile():
+    message = None
+    if request.method == 'POST':
+        email = request.form.get('email')
+        confirm = request.form.get('confirm')
+
+        if confirm == 'on':
+            cur = mysql.connection.cursor()
+            # Find user by email
+            cur.execute("SELECT id FROM users WHERE email = %s", (email,))
+            user = cur.fetchone()
+
+            if user:
+                user_id = user[0]
+                # Delete from related tables first
+                cur.execute("DELETE FROM user_research_interests WHERE user_id = %s", (user_id,))
+                cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+                mysql.connection.commit()
+                cur.close()
+                message = "Profile deleted successfully."
+            else:
+                message = "No profile found with that email."
+        else:
+            message = "You must confirm deletion to proceed."
+
+    return render_template('delete_profile.html', message=message)
+    
+
+## Mentorship Matching
+@app.route('/find_matches', methods=['GET', 'POST'])
+def find_matches():
+    matches = []
+    message = None
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+
+        cur = mysql.connection.cursor()
+        # Lookup user
+        cur.execute("SELECT id, name, interested_in FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()
+
+        if not user:
+            cur.close()
+            message = "No profile found for that email."
+            return render_template('find_matches.html', message=message)
+
+        user_id, user_name, user_interest_tags = user
+        user_tags = set(user_interest_tags.split(','))
+
+        # Get user's research interests
+        cur.execute("SELECT interest_id FROM user_research_interests WHERE user_id = %s", (user_id,))
+        user_interest_ids = {row[0] for row in cur.fetchall()}
+
+        # Get all other users and compare
+        cur.execute("SELECT id, name, email, academic_position, institution, department, bio, interested_in, headshot_path FROM users WHERE id != %s", (user_id,))
+        others = cur.fetchall()
+
+        for other in others:
+            other_id = other[0]
+            other_tags = set(other[7].split(','))
+
+            # Match logic: collaboration ↔ collaboration or mentor ↔ mentee
+            def is_match(user_tags, other_tags):
+                return (
+                    ('Collaboration' in user_tags and 'Collaboration' in other_tags) or
+                    ('Providing Mentorship' in user_tags and 'Receiving Mentorship' in other_tags) or
+                    ('Receiving Mentorship' in user_tags and 'Providing Mentorship' in other_tags)
+                )
+
+            if not is_match(user_tags, other_tags):
+                continue
+
+            # Check shared interests
+            cur.execute("SELECT interest_id FROM user_research_interests WHERE user_id = %s", (other_id,))
+            other_interest_ids = {row[0] for row in cur.fetchall()}
+
+            shared_interests = user_interest_ids.intersection(other_interest_ids)
+
+            if shared_interests:
+                # Get interest names
+                shared = []
+                for iid in shared_interests:
+                    cur.execute("SELECT name FROM research_interests WHERE id = %s", (iid,))
+                    result = cur.fetchone()
+                    if result:
+                        shared.append(result[0])
+
+                matches.append((other, shared))
+
+        cur.close()
+
+        if not matches:
+            message = "No strong matches found. Try updating your interests."
+
+    return render_template('find_matches.html', matches=matches, message=message)
+
 
 
 if __name__ == '__main__':

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Find Matches</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .match-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        .email {
+            font-size: 0.9em;
+            color: #444;
+        }
+        .shared-interests {
+            font-style: italic;
+            color: #555;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+        }
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Find Mentorship or Collaboration Matches</h2>
+    <form method="post">
+        <label for="email">Enter your email:</label>
+        <input type="email" name="email" required>
+        <input type="submit" value="Find Matches">
+    </form>
+
+    {% if message %}
+        <p><strong>{{ message }}</strong></p>
+    {% endif %}
+
+    {% if matches %}
+        <h3>Matches Found:</h3>
+        {% for profile, shared_interests in matches %}
+            <div class="match-card">
+                {% set image_filename = profile[8].split('/')[-1] %}
+                {% if image_filename == 'default.jpg' %}
+                    <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="Profile Picture">
+                {% else %}
+                    <img src="{{ url_for('uploaded_file', filename=image_filename) }}" alt="Profile Picture">
+                {% endif %}
+                <strong>{{ profile[1] }}</strong> — {{ profile[3] }} ({{ profile[4] }})<br>
+                <span class="email">Email: {{ profile[2] }}</span><br>
+                <div class="shared-interests">Shared Interests: {{ shared_interests | join(', ') }}</div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <a href="{{ url_for('home') }}" class="back-link">Back to Home</a>
+</body>
+</html>
