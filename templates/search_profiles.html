@@ -98,6 +98,7 @@
             <tr>
                 <th>Photo</th>
                 <th>Name</th>
+                <th>Email</th>
                 <th>Position</th>
                 <th>Institution</th>
                 <th>Department</th>
@@ -109,7 +110,7 @@
         <tbody>
             {% for profile in profiles %}
             <tr>
-                {% set image_filename = profile[7].split('/')[-1] %}
+                {% set image_filename = profile[8].split('/')[-1] %}
                 <td>
                     {% if image_filename == 'default.jpg' %}
                         <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="Profile Picture">
@@ -123,6 +124,7 @@
                 <td>{{ profile[4] }}</td>
                 <td>{{ profile[5] }}</td>
                 <td>{{ profile[6] }}</td>
+                <td>{{ profile[7] }}</td>
                 <td>
                     {% for interest in user_interests[profile[0]] %}
                         <span>{{ interest }}</span>{% if not loop.last %}, {% endif %}
