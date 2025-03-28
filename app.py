@@ -95,15 +95,18 @@ def create_profile():
 
         # Handle research interests
         selected_interests = request.form.getlist('research_interests')
-        new_interest = request.form.get('new_research_interest')
+        new_interest_input = request.form.get('new_research_interest')
 
-        # Insert new research interest if provided
-        if new_interest:
-            cur.execute("INSERT IGNORE INTO research_interests (name) VALUES (%s)", (new_interest,))
-            mysql.connection.commit()
-            cur.execute("SELECT id FROM research_interests WHERE name = %s", (new_interest,))
-            new_interest_id = cur.fetchone()[0]
-            selected_interests.append(str(new_interest_id))  # Add new interest to selected list
+        # Support multiple comma-separated new interests
+        if new_interest_input:
+            new_interests = [s.strip() for s in new_interest_input.split(',') if s.strip()]
+            for interest in new_interests:
+                cur.execute("INSERT IGNORE INTO research_interests (name) VALUES (%s)", (interest,))
+                mysql.connection.commit()
+                cur.execute("SELECT id FROM research_interests WHERE name = %s", (interest,))
+                new_interest_id = cur.fetchone()[0]
+                selected_interests.append(str(new_interest_id))
+
 
         # Handle file upload
         file = request.files.get('headshot')
