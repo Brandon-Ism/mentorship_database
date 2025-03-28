@@ -346,23 +346,48 @@ def search_profiles():
 
     if request.method == 'POST':
         query = request.form.get('query', '').lower().strip()
+        search_type = request.form.get('search_type')
+
         cur = mysql.connection.cursor()
 
-        # Search in users table
-        cur.execute("""
-            SELECT id, name, academic_position, institution, department, bio, interested_in, headshot_path
-            FROM users
-            WHERE LOWER(name) LIKE %s
-               OR LOWER(academic_position) LIKE %s
-               OR LOWER(institution) LIKE %s
-               OR LOWER(department) LIKE %s
-               OR LOWER(interested_in) LIKE %s
-               OR LOWER(bio) LIKE %s
-        """, tuple(['%' + query + '%'] * 6))
+        if search_type in ['position', 'interested_in']:
+            # Gather all checked options
+            options = request.form.getlist('query')
+            placeholders = ','.join(['%s'] * len(options))
 
-        results = cur.fetchall()
+            if search_type == 'position':
+                cur.execute(f"""
+                    SELECT * FROM users
+                    WHERE academic_position IN ({placeholders})
+                """, tuple(options))
 
-        # For each result, get their interests
+            elif search_type == 'interested_in':
+                conditions = ' OR '.join(["LOWER(interested_in) LIKE %s" for _ in options])
+                values = [f'%{opt.lower()}%' for opt in options]
+                cur.execute(f"""
+                    SELECT * FROM users
+                    WHERE {conditions}
+                """, tuple(values))
+
+            results = cur.fetchall()
+
+        elif search_type in ['name', 'institution', 'department', 'bio']:
+            cur.execute(f"""
+                SELECT * FROM users
+                WHERE LOWER({search_type}) LIKE %s
+            """, (f'%{query}%',))
+            results = cur.fetchall()
+
+        elif search_type == 'interests':
+            cur.execute("""
+                SELECT DISTINCT u.* FROM users u
+                JOIN user_research_interests uri ON u.id = uri.user_id
+                JOIN research_interests ri ON ri.id = uri.interest_id
+                WHERE LOWER(ri.name) LIKE %s
+            """, (f'%{query}%',))
+            results = cur.fetchall()
+
+        # Get research interests for each user
         for profile in results:
             user_id = profile[0]
             cur.execute("""
@@ -371,27 +396,6 @@ def search_profiles():
                 WHERE uri.user_id = %s
             """, (user_id,))
             user_interests[user_id] = [row[0] for row in cur.fetchall()]
-
-        # Also search directly in research interests
-        cur.execute("""
-            SELECT DISTINCT u.id, u.name, u.academic_position, u.institution, u.department, u.bio, u.interested_in, u.headshot_path
-            FROM users u
-            JOIN user_research_interests uri ON u.id = uri.user_id
-            JOIN research_interests ri ON ri.id = uri.interest_id
-            WHERE LOWER(ri.name) LIKE %s
-        """, ('%' + query + '%',))
-
-        interest_matches = cur.fetchall()
-        for profile in interest_matches:
-            if profile not in results:
-                results.append(profile)
-                user_id = profile[0]
-                cur.execute("""
-                    SELECT ri.name FROM research_interests ri
-                    JOIN user_research_interests uri ON ri.id = uri.interest_id
-                    WHERE uri.user_id = %s
-                """, (user_id,))
-                user_interests[user_id] = [row[0] for row in cur.fetchall()]
 
         cur.close()
 
