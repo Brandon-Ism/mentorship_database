@@ -27,7 +27,7 @@ CREATE TABLE `research_interests` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -36,7 +36,7 @@ CREATE TABLE `research_interests` (
 
 LOCK TABLES `research_interests` WRITE;
 /*!40000 ALTER TABLE `research_interests` DISABLE KEYS */;
-INSERT INTO `research_interests` VALUES (24,'Agile methodologies'),(39,'Algebra'),(1,'Algorithm design and analysis'),(9,'Anomaly detection'),(43,'Applied Mathematics'),(3,'Approximation algorithms'),(65,'ARIMA models'),(14,'Augmented and virtual reality'),(35,'Autonomous robots'),(48,'Bayesian inference'),(68,'Bayesian networks'),(82,'Biomechanics'),(75,'Black holes and singularities'),(21,'Blockchain technology'),(71,'Bootstrapping'),(26,'Cloud computing'),(64,'Cluster analysis'),(56,'Combinatorial optimization'),(34,'Computability theory'),(2,'Computational complexity theory'),(10,'Computer vision'),(77,'Condensed matter physics'),(22,'Cybersecurity'),(76,'Dark matter and dark energy'),(31,'Data centers'),(16,'Data mining'),(19,'Data visualization'),(8,'Databases'),(17,'Deep learning'),(44,'Differential equations'),(27,'Distributed algorithms'),(11,'Explainable AI'),(85,'Field theory'),(57,'Financial modeling'),(84,'Fluid dynamics'),(33,'Formal languages and automata'),(83,'Fusion research'),(53,'General relativity'),(41,'Geometry'),(55,'Graph theory'),(60,'High-performance computing'),(50,'Hypothesis testing'),(62,'Inferential statistics'),(29,'Internet of Things (IoT)'),(15,'Machine learning'),(67,'Markov Chain Monte Carlo (MCMC)'),(42,'Mathematical logic'),(46,'Mathematical modeling'),(80,'Molecular biophysics'),(70,'Monte Carlo simulations'),(63,'Multivariate regression'),(7,'Natural language processing (NLP)'),(30,'Network protocols'),(54,'Nonlinear dynamics and chaos theory'),(38,'Number theory'),(45,'Numerical analysis'),(32,'Operating systems'),(47,'Optimization'),(28,'Parallel computing'),(79,'Photonic and magnetic materials'),(18,'Predictive analytics'),(66,'Predictive modeling'),(81,'Protein folding'),(20,'Public-key cryptography'),(37,'Pure Mathematics'),(86,'Quantum computing'),(73,'Quantum field theory'),(52,'Quantum mechanics'),(69,'Random sampling methods'),(6,'Reinforcement learning'),(58,'Risk management'),(36,'Robotic perception and motion planning'),(61,'Scientific computing'),(23,'Software development life cycle'),(25,'Software testing and verification'),(87,'Sports medicine'),(72,'Statistical modeling'),(59,'Stochastic calculus'),(49,'Stochastic processes'),(74,'String theory'),(78,'Superconductivity'),(4,'Supervised learning'),(51,'Time series analysis'),(40,'Topology'),(5,'Unsupervised learning'),(13,'Usability studies'),(12,'User interface design');
+INSERT INTO `research_interests` VALUES (24,'Agile methodologies'),(39,'Algebra'),(1,'Algorithm design and analysis'),(9,'Anomaly detection'),(43,'Applied Mathematics'),(3,'Approximation algorithms'),(65,'ARIMA models'),(14,'Augmented and virtual reality'),(35,'Autonomous robots'),(48,'Bayesian inference'),(68,'Bayesian networks'),(90,'Biomathematics'),(89,'Biomathematics, Geometric Data Analysis'),(82,'Biomechanics'),(75,'Black holes and singularities'),(21,'Blockchain technology'),(71,'Bootstrapping'),(88,'Cellular automata'),(26,'Cloud computing'),(64,'Cluster analysis'),(56,'Combinatorial optimization'),(34,'Computability theory'),(2,'Computational complexity theory'),(10,'Computer vision'),(77,'Condensed matter physics'),(22,'Cybersecurity'),(76,'Dark matter and dark energy'),(31,'Data centers'),(16,'Data mining'),(19,'Data visualization'),(8,'Databases'),(17,'Deep learning'),(44,'Differential equations'),(27,'Distributed algorithms'),(11,'Explainable AI'),(85,'Field theory'),(57,'Financial modeling'),(84,'Fluid dynamics'),(33,'Formal languages and automata'),(83,'Fusion research'),(53,'General relativity'),(91,'Geometric Data Analysis'),(41,'Geometry'),(55,'Graph theory'),(60,'High-performance computing'),(50,'Hypothesis testing'),(62,'Inferential statistics'),(29,'Internet of Things (IoT)'),(15,'Machine learning'),(67,'Markov Chain Monte Carlo (MCMC)'),(42,'Mathematical logic'),(46,'Mathematical modeling'),(80,'Molecular biophysics'),(70,'Monte Carlo simulations'),(63,'Multivariate regression'),(7,'Natural language processing (NLP)'),(30,'Network protocols'),(54,'Nonlinear dynamics and chaos theory'),(38,'Number theory'),(45,'Numerical analysis'),(32,'Operating systems'),(47,'Optimization'),(28,'Parallel computing'),(79,'Photonic and magnetic materials'),(18,'Predictive analytics'),(66,'Predictive modeling'),(81,'Protein folding'),(20,'Public-key cryptography'),(37,'Pure Mathematics'),(86,'Quantum computing'),(73,'Quantum field theory'),(52,'Quantum mechanics'),(69,'Random sampling methods'),(6,'Reinforcement learning'),(58,'Risk management'),(36,'Robotic perception and motion planning'),(61,'Scientific computing'),(23,'Software development life cycle'),(25,'Software testing and verification'),(87,'Sports medicine'),(72,'Statistical modeling'),(59,'Stochastic calculus'),(49,'Stochastic processes'),(74,'String theory'),(78,'Superconductivity'),(4,'Supervised learning'),(51,'Time series analysis'),(40,'Topology'),(5,'Unsupervised learning'),(13,'Usability studies'),(12,'User interface design');
 /*!40000 ALTER TABLE `research_interests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -89,7 +89,7 @@ CREATE TABLE `user_research_interests` (
 
 LOCK TABLES `user_research_interests` WRITE;
 /*!40000 ALTER TABLE `user_research_interests` DISABLE KEYS */;
-INSERT INTO `user_research_interests` VALUES (1,60),(1,50),(1,29),(1,15),(1,87),(2,26),(2,77),(2,11),(2,85),(2,57),(3,39),(3,1),(3,9);
+INSERT INTO `user_research_interests` VALUES (1,60),(1,50),(1,29),(1,15),(1,87),(2,26),(2,77),(2,11),(2,85),(2,57),(3,39),(3,1),(3,9),(5,54),(5,88),(8,89),(8,43),(8,1),(8,34),(10,57),(10,30),(10,26);
 /*!40000 ALTER TABLE `user_research_interests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,10 +109,10 @@ CREATE TABLE `users` (
   `department` varchar(255) DEFAULT NULL,
   `bio` text,
   `interested_in` set('Collaboration','Providing Mentorship','Receiving Mentorship','N/A') NOT NULL,
-  `headshot_path` varchar(255) DEFAULT '/static/uploads/default.jpg',
+  `headshot_path` varchar(255) DEFAULT 'static/uploads/default.jpg',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,7 +121,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Matty Matador','matty@fake.csun.edu','Faculty','California State University, Northridge','Office of the President','Hello! I am Matty the Matador and I am looking for no collaboration at the moment!!','N/A','static/uploads/Matty-e1678816390439-circle.jpg'),(2,'Olivia Contreras','boot_with_the_fur@gmail.com','Undergraduate','CSUN','Dept. of CS','Hello!!\r\nI like cats! ','Receiving Mentorship','static/uploads/Matty-e1678816390439-circle.jpg'),(3,'John Doe','johndoe@email.com','Postdoc','University of College','Department of College','Hello','Collaboration','static/uploads/octocat-1738731809418.png'),(4,'Jane Doe','janedoe@email.com','Postdoc','Un','','','N/A','static/uploads/default.png');
+INSERT INTO `users` VALUES (1,'Matty Matador','matty@fake.csun.edu','Faculty','California State University, Northridge','Office of the President','Hello! I am Matty the Matador and I am looking for no collaboration at the moment!!','N/A','static/uploads/Matty-e1678816390439-circle.jpg'),(2,'Olivia Contreras','boot_with_the_fur@gmail.com','Undergraduate','CSUN','Dept. of CS','Hello!!\r\nI like cats! ','Receiving Mentorship','static/uploads/Matty-e1678816390439-circle.jpg'),(3,'John Doe','johndoe@email.com','Postdoc','University of College','Department of College','Hello','Collaboration','static/uploads/octocat-1738731809418.png'),(4,'Jane Doe','janedoe@email.com','Postdoc','Un','','','N/A','static/uploads/default.png'),(5,'test 2','test2@email.com','Graduate Student','University of College','Department of College','I am a person looking to mentor','Providing Mentorship','static/uploads/default.png'),(7,'test4','me@emaik','Undergraduate','','','','N/A','static/uploads/default.jpg'),(8,'test_update','testupdate@email.com','Postdoc','University of College','Department of College','Hello...','Providing Mentorship','static/uploads/default.jpg'),(10,'test A','test_a@email.com','Undergraduate','University of College','Department of College','hi...','Providing Mentorship','static/uploads/default.jpg');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -134,4 +134,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-21 21:13:03
+-- Dump completed on 2025-03-28  1:43:16
