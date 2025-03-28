@@ -46,17 +46,30 @@ def allowed_file(filename):
 def home():
     cur = mysql.connection.cursor()
 
-    # Fetch all user profiles
+    # Fetch user info
     cur.execute("""
         SELECT u.id, u.name, u.academic_position, u.institution, u.department, 
-               u.bio, u.interested_in, u.headshot_path 
+               u.bio, u.interested_in, u.headshot_path
         FROM users u 
         ORDER BY u.name ASC
     """)
-    profiles = cur.fetchall()
+    users = cur.fetchall()
+
+    # Fetch all research interests for users
+    user_interests = {}
+    for user in users:
+        user_id = user[0]
+        cur.execute("""
+            SELECT ri.name FROM research_interests ri
+            JOIN user_research_interests uri ON ri.id = uri.interest_id
+            WHERE uri.user_id = %s
+        """, (user_id,))
+        interests = [row[0] for row in cur.fetchall()]
+        user_interests[user_id] = interests
 
     cur.close()
-    return render_template('home.html', profiles=profiles)
+    return render_template('home.html', profiles=users, user_interests=user_interests)
+
 
 from flask import send_from_directory
 
@@ -100,7 +113,7 @@ def create_profile():
             file.save(file_path)  # Save file to static/uploads/
             headshot_path = file_path
         else:
-            headshot_path = "static/uploads/default.png"
+            headshot_path = "static/uploads/default.jpg"
 
         # Insert user into database
         cur.execute("""
@@ -114,8 +127,9 @@ def create_profile():
         user_id = cur.fetchone()[0]
 
         # Insert selected research interests
-        for interest_id in selected_interests:
-            cur.execute("INSERT INTO user_research_interests (user_id, interest_id) VALUES (%s, %s)", (user_id, interest_id))
+        for interest_id in set(selected_interests):  # remove duplicates just in case
+            cur.execute("INSERT IGNORE INTO user_research_interests (user_id, interest_id) VALUES (%s, %s)", (user_id, interest_id))
+
         
         mysql.connection.commit()
         cur.close()

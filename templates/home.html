@@ -4,29 +4,94 @@
     <meta charset="UTF-8">
     <title>Mentorship & Research Collaboration</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
-        .profile-container { display: flex; flex-wrap: wrap; gap: 15px; }
-        .profile-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 300px; text-align: center; }
-        img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+            vertical-align: top;
+        }
+        img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .create-button {
+            text-decoration: none;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+        }
+        .create-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Mentorship & Research Collaboration Profiles</h1>
-
-    <div class="profile-container">
-        {% for profile in profiles %}
-        <div class="profile-card">
-            <img src="{{ url_for('uploaded_file', filename=profile[6].split('/')[-1]) }}" alt="Profile Picture">
-            <h3>{{ profile[1] }}</h3>
-            <p><strong>Position:</strong> {{ profile[2] }}</p>
-            <p><strong>Institution:</strong> {{ profile[3] }}</p>
-            <p><strong>Department:</strong> {{ profile[4] }}</p>
-            <p><strong>Interested In:</strong> {{ profile[5] }}</p>
-            <a href="#">View Full Profile</a>  <!-- Will link to a profile details page later -->
-        </div>
-        {% endfor %}
+    <div class="header">
+        <h1>Mentorship & Research Collaboration Profiles</h1>
+        <a href="{{ url_for('create_profile') }}" class="create-button">Create Profile</a>
     </div>
+
+    {% if profiles %}
+    <table>
+        <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Institution</th>
+                <th>Department</th>
+                <th>Bio</th>
+                <th>Interested In</th>
+                <th>Research Interests</th>
+            </tr>
+        </thead>        
+        <tbody>
+            {% for profile in profiles %}
+            <tr>
+                <td>
+                    {% set image_filename = profile[7].split('/')[-1] %}
+                    {% if image_filename == 'default.jpg' %}
+                        <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="Profile Picture">
+                    {% else %}
+                        <img src="{{ url_for('uploaded_file', filename=image_filename) }}" alt="Profile Picture">
+                    {% endif %}
+                </td>
+                <td>{{ profile[1] }}</td>
+                <td>{{ profile[2] }}</td>
+                <td>{{ profile[3] }}</td>
+                <td>{{ profile[4] }}</td>
+                <td>{{ profile[5] }}</td>
+                <td>{{ profile[6] }}</td>
+                <td>
+                    {% for interest in user_interests[profile[0]] %}
+                        <span>{{ interest }}</span>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No profiles found. <a href="{{ url_for('create_profile') }}">Be the first to create one!</a></p>
+    {% endif %}
 
 </body>
 </html>
