@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Mentorship & Research Collaboration</title>
+    <title>Search Profiles</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 40px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         table {
             width: 100%;
@@ -30,29 +24,40 @@
             object-fit: cover;
             border-radius: 50%;
         }
-        .create-button {
-            text-decoration: none;
+        .back-button, .search-button {
             padding: 8px 16px;
             background-color: #007bff;
             color: white;
             border-radius: 6px;
+            text-decoration: none;
         }
-        .create-button:hover {
+        .search-button:hover, .back-button:hover {
             background-color: #0056b3;
+        }
+        .search-section {
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
+    <h2>Search Mentorship & Research Profiles</h2>
 
-    <div class="header">
-        <h1>Mentorship & Research Collaboration Profiles</h1>
-        <a href="{{ url_for('find_matches') }}" class="create-button">Find Matches</a>
-        <a href="{{ url_for('search_profiles') }}" class="create-button">Search</a>
+    <form method="post">
+        <div class="search-section">
+            <label><strong>Select a field to search:</strong></label><br>
+            <input type="radio" name="search_type" value="name" required> Name
+            <input type="radio" name="search_type" value="position"> Position
+            <input type="radio" name="search_type" value="institution"> Institution
+            <input type="radio" name="search_type" value="department"> Department
+            <input type="radio" name="search_type" value="interested_in"> Interested In
+            <input type="radio" name="search_type" value="interests"> Research Interests
+        </div>
 
-        <a href="{{ url_for('create_profile') }}" class="create-button">Create Profile</a>
-        <a href="{{ url_for('update_profile') }}" class="create-button">Update My Profile</a>
-
-    </div>
+        <div class="search-section">
+            <input type="text" name="query" value="{{ query }}" placeholder="Enter keyword..." required>
+            <input type="submit" value="Search" class="search-button">
+        </div>
+    </form>
 
     {% if profiles %}
     <table>
@@ -67,12 +72,12 @@
                 <th>Interested In</th>
                 <th>Research Interests</th>
             </tr>
-        </thead>        
+        </thead>
         <tbody>
             {% for profile in profiles %}
             <tr>
+                {% set image_filename = profile[7].split('/')[-1] %}
                 <td>
-                    {% set image_filename = profile[7].split('/')[-1] %}
                     {% if image_filename == 'default.jpg' %}
                         <img src="{{ url_for('static', filename='uploads/default.jpg') }}" alt="Profile Picture">
                     {% else %}
@@ -94,16 +99,10 @@
             {% endfor %}
         </tbody>
     </table>
-    {% else %}
-        <p>No profiles found. <a href="{{ url_for('create_profile') }}">Be the first to create one!</a></p>
+    {% elif query %}
+        <p>No results found for "<strong>{{ query }}</strong>".</p>
     {% endif %}
 
-    <div style="text-align: right; margin-top: 30px;">
-        <a href="{{ url_for('delete_profile') }}" style="color: white; background-color: red; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 14px;">
-            Delete My Profile
-        </a>
-    </div>
-    
-
+    <a href="{{ url_for('home') }}" class="back-button">Back to Home</a>
 </body>
 </html>

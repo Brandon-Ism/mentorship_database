@@ -336,6 +336,68 @@ def find_matches():
     return render_template('find_matches.html', matches=matches, message=message)
 
 
+# Search route
+
+@app.route('/search_profiles', methods=['GET', 'POST'])
+def search_profiles():
+    results = []
+    user_interests = {}
+    query = ""
+
+    if request.method == 'POST':
+        query = request.form.get('query', '').lower().strip()
+        cur = mysql.connection.cursor()
+
+        # Search in users table
+        cur.execute("""
+            SELECT id, name, academic_position, institution, department, bio, interested_in, headshot_path
+            FROM users
+            WHERE LOWER(name) LIKE %s
+               OR LOWER(academic_position) LIKE %s
+               OR LOWER(institution) LIKE %s
+               OR LOWER(department) LIKE %s
+               OR LOWER(interested_in) LIKE %s
+               OR LOWER(bio) LIKE %s
+        """, tuple(['%' + query + '%'] * 6))
+
+        results = cur.fetchall()
+
+        # For each result, get their interests
+        for profile in results:
+            user_id = profile[0]
+            cur.execute("""
+                SELECT ri.name FROM research_interests ri
+                JOIN user_research_interests uri ON ri.id = uri.interest_id
+                WHERE uri.user_id = %s
+            """, (user_id,))
+            user_interests[user_id] = [row[0] for row in cur.fetchall()]
+
+        # Also search directly in research interests
+        cur.execute("""
+            SELECT DISTINCT u.id, u.name, u.academic_position, u.institution, u.department, u.bio, u.interested_in, u.headshot_path
+            FROM users u
+            JOIN user_research_interests uri ON u.id = uri.user_id
+            JOIN research_interests ri ON ri.id = uri.interest_id
+            WHERE LOWER(ri.name) LIKE %s
+        """, ('%' + query + '%',))
+
+        interest_matches = cur.fetchall()
+        for profile in interest_matches:
+            if profile not in results:
+                results.append(profile)
+                user_id = profile[0]
+                cur.execute("""
+                    SELECT ri.name FROM research_interests ri
+                    JOIN user_research_interests uri ON ri.id = uri.interest_id
+                    WHERE uri.user_id = %s
+                """, (user_id,))
+                user_interests[user_id] = [row[0] for row in cur.fetchall()]
+
+        cur.close()
+
+    return render_template('search_profiles.html', profiles=results, user_interests=user_interests, query=query)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
