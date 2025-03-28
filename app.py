@@ -42,7 +42,7 @@ def allowed_file(filename):
     """Check if the uploaded file is an allowed type."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Update to homepage route to support sorting by name, institution, or interested_in
+# Fix homepage SQL query to exclude email and align fields to table headers
 
 @app.route('/')
 def home():
@@ -58,7 +58,7 @@ def home():
     cur = mysql.connection.cursor()
 
     cur.execute(f"""
-        SELECT u.id, u.name, u.email, u.academic_position, u.institution, u.department,
+        SELECT u.id, u.name, u.academic_position, u.institution, u.department,
                u.bio, u.interested_in, u.headshot_path
         FROM users u
         ORDER BY {order_clause} ASC

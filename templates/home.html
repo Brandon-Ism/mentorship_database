@@ -46,6 +46,7 @@
 
     <div class="header">
         <h1>Mentorship & Collaboration Profiles</h1>
+        
         <a href="{{ url_for('find_matches') }}" class="create-button">Find Matches</a>
         <a href="{{ url_for('search_profiles') }}" class="create-button">Search</a>
 
@@ -53,6 +54,14 @@
         <a href="{{ url_for('update_profile') }}" class="create-button">Update My Profile</a>
 
     </div>
+
+    <div class="sort-options">
+    <strong>Sort by:</strong>
+    <a href="{{ url_for('home', sort_by='name') }}">Name</a> |
+    <a href="{{ url_for('home', sort_by='institution') }}">Institution</a> |
+    <a href="{{ url_for('home', sort_by='interested_in') }}">Interested In</a>
+</div>
+
 
     {% if profiles %}
     <table>
