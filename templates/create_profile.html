@@ -1,8 +1,26 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Create Profile</title>
+    <style>
+        .button-group {
+            margin-top: 20px;
+        }
+        .cancel-button {
+            margin-left: 10px;
+            background-color: #ccc;
+            color: black;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .cancel-button:hover {
+            background-color: #999;
+        }
+    </style>
 </head>
 <body>
     <h2>Create a New Profile</h2>
@@ -49,8 +67,14 @@
         {% endfor %}
 
         <label for="new_research_interest">Or Add New Interests (separate with commas):</label>
-        <input type="text" name="new_research_interest"><br>        
-        <input type="submit" value="Create Profile">
+        <input type="text" name="new_research_interest"><br>
+
+        <div class="button-group">
+            <input type="submit" value="Create Profile">
+            <a href="{{ url_for('home') }}" class="cancel-button">Cancel and Return to Homepage</a>
+        </div>
     </form>
 </body>
 </html>
+
+

@@ -369,13 +369,13 @@ def search_profiles():
                 """, tuple(options))
 
             elif search_type == 'interested_in':
-                conditions = ' OR '.join(["LOWER(interested_in) LIKE %s" for _ in options])
-                values = [f'%{opt.lower()}%' for opt in options]
+                conditions = ' OR '.join(["FIND_IN_SET(%s, REPLACE(interested_in, ', ', ',')) > 0" for _ in options])
                 cur.execute(f"""
                     SELECT id, name, email, academic_position, institution, department, bio, interested_in, headshot_path
                     FROM users
                     WHERE {conditions}
-                """, tuple(values))
+                """, tuple(options))
+
 
             results = cur.fetchall()
 
