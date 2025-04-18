@@ -25,12 +25,15 @@
         <textarea name="bio">{{ user[6] }}</textarea><br>
 
         <label for="interested_in">Interested In:</label>
+
         <select name="interested_in" multiple required>
             <option value="Collaboration" {% if 'Collaboration' in user[7] %}selected{% endif %}>Collaboration</option>
             <option value="Providing Mentorship" {% if 'Providing Mentorship' in user[7] %}selected{% endif %}>Providing Mentorship</option>
             <option value="Receiving Mentorship" {% if 'Receiving Mentorship' in user[7] %}selected{% endif %}>Receiving Mentorship</option>
         </select><br>
 
+
+        
         <label for="headshot">Update Profile Picture:</label>
         <input type="file" name="headshot" accept=".png, .jpg, .jpeg, .gif"><br>
 
@@ -48,3 +51,8 @@
     <p><a href="{{ url_for('home') }}">Back to Home</a></p>
 </body>
 </html>
+
+
+
+
+

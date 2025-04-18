@@ -4,7 +4,10 @@ import config
 import os 
 from werkzeug.utils import secure_filename
 
+
+
 app = Flask(__name__)
+
 
 # Load MySQL configuration
 app.config['MYSQL_HOST'] = config.Config.MYSQL_HOST
@@ -27,6 +30,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 @app.route('/test_db')
+
 def test_db():
     try:
         cur = mysql.connection.cursor()
@@ -45,6 +49,7 @@ def allowed_file(filename):
 # Fix homepage SQL query to exclude email and align fields to table headers
 
 @app.route('/')
+
 def home():
     sort_by = request.args.get('sort_by', 'name')
     valid_sort_columns = {
@@ -79,15 +84,24 @@ def home():
     return render_template('home.html', profiles=users, user_interests=user_interests, sort_by=sort_by)
 
 
+
+
+
+
 from flask import send_from_directory
 
 @app.route('/static/uploads/<filename>')
+
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 
+
+
+
 @app.route('/create_profile', methods=['GET', 'POST'])
+
 def create_profile():
     cur = mysql.connection.cursor()
 
@@ -156,7 +170,11 @@ def create_profile():
 
 
 
+
+
+
 @app.route('/update_profile', methods=['GET', 'POST'])
+
 def update_profile():
     cur = mysql.connection.cursor()
     
@@ -177,6 +195,7 @@ def update_profile():
         """, (user[0],))
         selected_interests = [row[0] for row in cur.fetchall()]
 
+
         # Fetch all available interests
         cur.execute("SELECT id, name FROM research_interests ORDER BY name ASC")
         all_interests = cur.fetchall()
@@ -185,11 +204,18 @@ def update_profile():
 
         return render_template('edit_profile.html', user=user, selected_interests=selected_interests, research_interests=all_interests)
 
+
+
     return render_template('update_profile.html')
+
+
+
+
 
 
 # Handle profile update POST request
 @app.route('/edit_profile/<int:user_id>', methods=['POST'])
+
 def edit_profile(user_id):
     cur = mysql.connection.cursor()
 
@@ -222,6 +248,7 @@ def edit_profile(user_id):
 
     mysql.connection.commit()
 
+
     # Update research interests
     cur.execute("DELETE FROM user_research_interests WHERE user_id = %s", (user_id,))
     selected_interests = request.form.getlist('research_interests')
@@ -244,8 +271,13 @@ def edit_profile(user_id):
 
     return redirect(url_for('home'))
 
+
+
+
+
 # Delete_profile route
 @app.route('/delete_profile', methods=['GET', 'POST'])
+
 def delete_profile():
     message = None
     if request.method == 'POST':
@@ -274,8 +306,12 @@ def delete_profile():
     return render_template('delete_profile.html', message=message)
     
 
+
+
+
 ## Mentorship Matching
 @app.route('/find_matches', methods=['GET', 'POST'])
+
 def find_matches():
     matches = []
     message = None
@@ -296,7 +332,7 @@ def find_matches():
         user_id, user_name, user_interest_tags = user
         user_tags = set(user_interest_tags.split(','))
 
-        # Get user's research interests
+        # Get users research interests
         cur.execute("SELECT interest_id FROM user_research_interests WHERE user_id = %s", (user_id,))
         user_interest_ids = {row[0] for row in cur.fetchall()}
 
@@ -308,7 +344,7 @@ def find_matches():
             other_id = other[0]
             other_tags = set(other[7].split(','))
 
-            # Match logic: collaboration ↔ collaboration or mentor ↔ mentee
+            # Match logic: collaboration collaboration or mentor  mentee
             def is_match(user_tags, other_tags):
                 return (
                     ('Collaboration' in user_tags and 'Collaboration' in other_tags) or
@@ -344,8 +380,12 @@ def find_matches():
     return render_template('find_matches.html', matches=matches, message=message)
 
 
+
+
+
 # Search route
 @app.route('/search_profiles', methods=['GET', 'POST'])
+
 def search_profiles():
     results = []
     user_interests = {}
@@ -408,8 +448,11 @@ def search_profiles():
 
         cur.close()
 
+
     return render_template('search_profiles.html', profiles=results, user_interests=user_interests, query=query)
 
+
+####
 
 
 if __name__ == '__main__':

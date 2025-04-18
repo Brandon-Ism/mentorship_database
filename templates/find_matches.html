@@ -51,9 +51,13 @@
         <input type="submit" value="Find Matches">
     </form>
 
+
+    
     {% if message %}
         <p><strong>{{ message }}</strong></p>
     {% endif %}
+
+
 
     {% if matches %}
         <h3>Matches Found:</h3>
@@ -75,3 +79,6 @@
     <a href="{{ url_for('home') }}" class="back-link">Back to Home</a>
 </body>
 </html>
+
+
+
