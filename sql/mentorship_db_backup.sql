@@ -41,32 +41,6 @@ INSERT INTO `research_interests` VALUES (24,'Agile methodologies'),(39,'Algebra'
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_links`
---
-
-DROP TABLE IF EXISTS `user_links`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_links` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int DEFAULT NULL,
-  `link` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `user_links_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_links`
---
-
-LOCK TABLES `user_links` WRITE;
-/*!40000 ALTER TABLE `user_links` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_links` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_research_interests`
 --
 
@@ -134,4 +108,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-17 16:36:30
+-- Dump completed on 2025-04-20 14:08:48
