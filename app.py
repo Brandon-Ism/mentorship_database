@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 
-# Load MySQL configuration
+# Load MySQL configuration and establish connection
 app.config['MYSQL_HOST'] = config.Config.MYSQL_HOST
 app.config['MYSQL_USER'] = config.Config.MYSQL_USER
 app.config['MYSQL_PASSWORD'] = config.Config.MYSQL_PASSWORD
@@ -20,7 +20,7 @@ mysql = MySQL(app)
     
 # Upload settings
 UPLOAD_FOLDER = 'static/uploads/'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'} # only images allowed for headshots
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Ensure the uploads folder exists
@@ -28,7 +28,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
     
 
-
+# Test conenction to database by listing all tables
 @app.route('/test_db')
 
 def test_db():
@@ -42,16 +42,22 @@ def test_db():
         return f"Database error: {str(e)}"
 
 
+# Check if the uploaded file is of an allowed types
 def allowed_file(filename):
-    """Check if the uploaded file is an allowed type."""
+
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Fix homepage SQL query to exclude email and align fields to table headers
+# TODO: Fix homepage SQL query to exclude email and align fields to table headers
+
+
 
 @app.route('/')
 
 def home():
-    sort_by = request.args.get('sort_by', 'name')
+    # Dynamically sort all user profiles by name
+
+    sort_by = request.args.get('sort_by', 'name') # check if user choses a sort option, if not sort by name
+    #sorting only allowed on valid columns
     valid_sort_columns = {
         'name': 'u.name',
         'institution': 'u.institution',
@@ -60,16 +66,19 @@ def home():
 
     order_clause = valid_sort_columns.get(sort_by, 'u.name')
 
+    # Open cursor to execute sql commands
     cur = mysql.connection.cursor()
 
+    # store all basic user info into a tuple with sorting
     cur.execute(f"""
         SELECT u.id, u.name, u.academic_position, u.institution, u.department,
                u.bio, u.interested_in, u.headshot_path
         FROM users u
         ORDER BY {order_clause} ASC
     """)
-    users = cur.fetchall()
+    users = cur.fetchall() # store as tuple
 
+    #
     user_interests = {}
     for user in users:
         user_id = user[0]
