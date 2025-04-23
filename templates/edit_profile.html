@@ -24,13 +24,17 @@
         <label for="bio">Bio:</label>
         <textarea name="bio">{{ user[6] }}</textarea><br>
 
-        <label for="interested_in">Interested In:</label>
-
-        <select name="interested_in" multiple required>
-            <option value="Collaboration" {% if 'Collaboration' in user[7] %}selected{% endif %}>Collaboration</option>
-            <option value="Providing Mentorship" {% if 'Providing Mentorship' in user[7] %}selected{% endif %}>Providing Mentorship</option>
-            <option value="Receiving Mentorship" {% if 'Receiving Mentorship' in user[7] %}selected{% endif %}>Receiving Mentorship</option>
-        </select><br>
+        <label><strong>Interested In:</strong></label><br>
+        {% set current_roles = user[7].split(',') %}
+        <input type="checkbox" name="interested_in" value="Collaboration"
+            {% if 'Collaboration' in current_roles %}checked{% endif %}> Collaboration<br>
+        <input type="checkbox" name="interested_in" value="Providing Mentorship"
+            {% if 'Providing Mentorship' in current_roles %}checked{% endif %}> Providing Mentorship<br>
+        <input type="checkbox" name="interested_in" value="Receiving Mentorship"
+            {% if 'Receiving Mentorship' in current_roles %}checked{% endif %}> Receiving Mentorship<br>
+        <input type="checkbox" name="interested_in" value="N/A"
+            {% if 'N/A' in current_roles %}checked{% endif %}> N/A<br>
+        
 
 
         
