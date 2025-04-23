@@ -69,7 +69,7 @@
                 {% else %}
                     <img src="{{ url_for('uploaded_file', filename=image_filename) }}" alt="Profile Picture">
                 {% endif %}
-                <strong>{{ profile[1] }}</strong> — {{ profile[3] }} ({{ profile[4] }})<br>
+                <strong>{{ profile[1] }}</strong> - {{ profile[3] }} ({{ profile[4] }})<br>
                 <span class="email">Email: {{ profile[2] }}</span><br>
                 <div class="shared-interests">Shared Interests: {{ shared_interests | join(', ') }}</div>
             </div>

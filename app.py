@@ -69,7 +69,7 @@ def home():
     # Open cursor to execute sql commands
     cur = mysql.connection.cursor()
 
-    # store all basic user info into a tuple with sorting
+    # Store all basic user info into a tuple with sorting
     cur.execute(f"""
         SELECT u.id, u.name, u.academic_position, u.institution, u.department,
                u.bio, u.interested_in, u.headshot_path
@@ -78,18 +78,24 @@ def home():
     """)
     users = cur.fetchall() # store as tuple
 
-    #
+    # Create dictionary to map user_id and list of interest name
     user_interests = {}
+
+    # Loop over every user
     for user in users:
         user_id = user[0]
+        # Query interests for user_i by joining reserch_interests and user_research_interestss
         cur.execute("""
             SELECT ri.name FROM research_interests ri
             JOIN user_research_interests uri ON ri.id = uri.interest_id
             WHERE uri.user_id = %s
         """, (user_id,))
+
+        # Map user_id and list of interests
         user_interests[user_id] = [row[0] for row in cur.fetchall()]
 
     cur.close()
+    # To display results on hompepage
     return render_template('home.html', profiles=users, user_interests=user_interests, sort_by=sort_by)
 
 
@@ -99,6 +105,7 @@ def home():
 
 from flask import send_from_directory
 
+# Serve file from uploads folder for profile images
 @app.route('/static/uploads/<filename>')
 
 def uploaded_file(filename):
@@ -187,13 +194,15 @@ def create_profile():
 def update_profile():
     cur = mysql.connection.cursor()
     
+    # User has submitted their email in the form
     if request.method == 'POST':
         email = request.form.get('email')
 
-        # Find user by email
+        # Find user by email and return full user record
         cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
 
+        # If no profile found with that email, notify user
         if not user:
             cur.close()
             return render_template('update_profile.html', error="No profile found for that email.")
@@ -211,6 +220,7 @@ def update_profile():
 
         cur.close()
 
+        # Send profile and interests selctions to html form
         return render_template('edit_profile.html', user=user, selected_interests=selected_interests, research_interests=all_interests)
 
 
@@ -222,12 +232,13 @@ def update_profile():
 
 
 
-# Handle profile update POST request
+# Profile update POST request
 @app.route('/edit_profile/<int:user_id>', methods=['POST'])
 
 def edit_profile(user_id):
     cur = mysql.connection.cursor()
 
+    # Collect basic user fileds user may have edited
     name = request.form.get('name')
     academic_position = request.form.get('academic_position')
     institution = request.form.get('institution')
@@ -238,17 +249,22 @@ def edit_profile(user_id):
 
     # Handle file upload
     file = request.files.get('headshot')
+    # If the headshot was updated, updated the path
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
         headshot_path = file_path
+
+        # Update the entire profile with the new headshot path
         cur.execute("""
             UPDATE users SET name=%s, academic_position=%s, institution=%s, 
             department=%s, bio=%s, interested_in=%s, headshot_path=%s 
             WHERE id=%s
         """, (name, academic_position, institution, department, bio, interested_in_str, headshot_path, user_id))
+    
     else:
+        # If no new file uploaded, update all other fields
         cur.execute("""
             UPDATE users SET name=%s, academic_position=%s, institution=%s, 
             department=%s, bio=%s, interested_in=%s 
@@ -258,20 +274,25 @@ def edit_profile(user_id):
     mysql.connection.commit()
 
 
-    # Update research interests
+    # Delete old research inrerests to allow for new ones
     cur.execute("DELETE FROM user_research_interests WHERE user_id = %s", (user_id,))
+    # Get the selected and new interests from the form
     selected_interests = request.form.getlist('research_interests')
     new_interest_input = request.form.get('new_research_interest')
 
+    # Handle new, custom interests without allowing duplicates 
     if new_interest_input:
-        new_interests = [s.strip() for s in new_interest_input.split(',') if s.strip()]
+        new_interests = [s.strip() for s in new_interest_input.split(',') if s.strip()] # separate intersts with comma
         for interest in new_interests:
+            # Add to research_interests table
             cur.execute("INSERT IGNORE INTO research_interests (name) VALUES (%s)", (interest,))
             mysql.connection.commit()
+
             cur.execute("SELECT id FROM research_interests WHERE name = %s", (interest,))
             new_interest_id = cur.fetchone()[0]
             selected_interests.append(str(new_interest_id))
 
+    # Insert all current interests with a set to remove duplicates
     for interest_id in set(selected_interests):
         cur.execute("INSERT IGNORE INTO user_research_interests (user_id, interest_id) VALUES (%s, %s)", (user_id, interest_id))
 
@@ -284,32 +305,38 @@ def edit_profile(user_id):
 
 
 
-# Delete_profile route
+# Delete_profile. Show deletion form and process request to delete user
 @app.route('/delete_profile', methods=['GET', 'POST'])
 
 def delete_profile():
     message = None
-    if request.method == 'POST':
-        email = request.form.get('email')
-        confirm = request.form.get('confirm')
 
+    # Check if user selects to delete profile
+    if request.method == 'POST':
+        email = request.form.get('email') # get user email
+        confirm = request.form.get('confirm') # if checkbox checked, a requirement
+
+        # If both email entered and checkbox
         if confirm == 'on':
             cur = mysql.connection.cursor()
             # Find user by email
             cur.execute("SELECT id FROM users WHERE email = %s", (email,))
-            user = cur.fetchone()
+            user = cur.fetchone() # if found, user is tuple
 
             if user:
                 user_id = user[0]
-                # Delete from related tables first
-                cur.execute("DELETE FROM user_research_interests WHERE user_id = %s", (user_id,))
+                # Delete from related tables 
+                cur.execute("DELETE FROM user_research_interests WHERE user_id = %s", (user_id,)) # delete from many to many table first
                 cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+
                 mysql.connection.commit()
                 cur.close()
                 message = "Profile deleted successfully."
+
             else:
                 message = "No profile found with that email."
         else:
+            # Email and checkbox not both entered
             message = "You must confirm deletion to proceed."
 
     return render_template('delete_profile.html', message=message)
@@ -319,12 +346,14 @@ def delete_profile():
 
 
 ## Mentorship Matching
+
 @app.route('/find_matches', methods=['GET', 'POST'])
 
 def find_matches():
-    matches = []
-    message = None
+    matches = [] # to store all compatible users and interests
+    message = None # return feedback
 
+    # Form to match is submitted
     if request.method == 'POST':
         email = request.form.get('email')
 
@@ -333,27 +362,31 @@ def find_matches():
         cur.execute("SELECT id, name, interested_in FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
 
+        # If email does not match any current profiles
         if not user:
             cur.close()
             message = "No profile found for that email."
             return render_template('find_matches.html', message=message)
 
-        user_id, user_name, user_interest_tags = user
-        user_tags = set(user_interest_tags.split(','))
 
-        # Get users research interests
+        user_id, user_name, user_interest_tags = user
+        user_tags = set(user_interest_tags.split(',')) # create a set from their intents
+
+        # Get rhe set of research interests IDs for user
         cur.execute("SELECT interest_id FROM user_research_interests WHERE user_id = %s", (user_id,))
         user_interest_ids = {row[0] for row in cur.fetchall()}
 
-        # Get all other users and compare
+        # Look at all other users (except current) and compare
         cur.execute("SELECT id, name, email, academic_position, institution, department, bio, interested_in, headshot_path FROM users WHERE id != %s", (user_id,))
         others = cur.fetchall()
 
+        # Loop through users
+        # Extract interested_in tags for user and convert to set
         for other in others:
             other_id = other[0]
             other_tags = set(other[7].split(','))
 
-            # Match logic: collaboration collaboration or mentor  mentee
+            # Match logic. collaboration to collaboration, or mentor to mentee
             def is_match(user_tags, other_tags):
                 return (
                     ('Collaboration' in user_tags and 'Collaboration' in other_tags) or
@@ -361,6 +394,7 @@ def find_matches():
                     ('Receiving Mentorship' in user_tags and 'Providing Mentorship' in other_tags)
                 )
 
+            # Skip to next user if no match
             if not is_match(user_tags, other_tags):
                 continue
 
@@ -368,10 +402,11 @@ def find_matches():
             cur.execute("SELECT interest_id FROM user_research_interests WHERE user_id = %s", (other_id,))
             other_interest_ids = {row[0] for row in cur.fetchall()}
 
+            # Compute intersection to get common interests with user
             shared_interests = user_interest_ids.intersection(other_interest_ids)
 
             if shared_interests:
-                # Get interest names
+                # Get interest names for each shared interest ID
                 shared = []
                 for iid in shared_interests:
                     cur.execute("SELECT name FROM research_interests WHERE id = %s", (iid,))
@@ -379,6 +414,7 @@ def find_matches():
                     if result:
                         shared.append(result[0])
 
+                # Store user's full profile tuple and a list of shared interests
                 matches.append((other, shared))
 
         cur.close()
@@ -386,6 +422,7 @@ def find_matches():
         if not matches:
             message = "No strong matches found. Try updating your interests."
 
+    # Render matches, and display message if needed
     return render_template('find_matches.html', matches=matches, message=message)
 
 
@@ -396,13 +433,14 @@ def find_matches():
 @app.route('/search_profiles', methods=['GET', 'POST'])
 
 def search_profiles():
+    # Store matching profiles, list of interest names
     results = []
     user_interests = {}
     query = ""
 
     if request.method == 'POST':
-        query = request.form.get('query', '').lower().strip()
-        search_type = request.form.get('search_type')
+        query = request.form.get('query', '').lower().strip() # To be user entered
+        search_type = request.form.get('search_type') # type of entry
 
         cur = mysql.connection.cursor()
 
