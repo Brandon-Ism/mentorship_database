@@ -1,80 +1,113 @@
-# Mentorship & Research Collaboration Matching System
+# 🎓 Mentorship & Research Collaboration Matching System
 
-This project is a simple web-based system that allows users to create, browse, update, delete, and search for academic profiles to connect for mentorship or collaboration.
+A clean, web-based platform that allows students, faculty, and researchers to create academic profiles, search for others by research interest or mentorship intent, and connect for collaboration.
+
+Built using **Flask**, **MySQL**, and **HTML/CSS**, this project was completed as part of a database design course and demonstrates a fully functional CRUD+Search system backed by a normalized relational schema.
+
+---
 
 ## Features
-- Create a new profile with research interests and mentorship/collaboration roles
-- Upload a custom headshot or use a default one
-- View all profiles in a clean searchable table
-- Search by:
-  - Name, Position, Institution, Department
-  - Mentorship/Collaboration intent
-  - Research Interests
-- Update or delete profiles by verifying your email
-- Demo-ready with 11 dummy profiles + 1 live demo user to show create/update/delete/match
+
+- Create academic profiles with position, institution, bio, and headshot
+- Select up to 5 research interests (with keyword reuse and autocomplete)
+- Indicate intent: Collaboration, Providing Mentorship, Receiving Mentorship
+- View all profiles in a clean, tabular layout
+- Full-text and filter-based search:
+  - Name, Institution, Department
+  - Position & Interested-In filters (checkboxes)
+  - Keyword match for interests
+- Email-based profile update & deletion
+- Built-in matching logic to connect users with shared interests and compatible roles
 
 ---
 
-## How to Run This Project
+## ER Diagram
 
-### Requirements:
+Below is the core database design, normalized to 3NF with clean many-to-many relationships:
+
+![ER Diagram](static/ER_diagram.png)
+
+---
+
+## Getting Started
+
+### Requirements
+
 - Python 3.10+
-- MySQL server
-- Flask + MySQL bindings
+- MySQL Server
+- Flask (`flask`, `flask-mysqldb`)
+- Linux/macOS or WSL recommended for environment setup
 
 ---
 
-### 1. Clone the Repo
+### Installation Steps
+
+#### 1. Clone the Repository
 ```bash
 git clone <repo-url>
 cd mentorship_database
 ```
 
-### 2. Create and Activate Virtual Environment
+#### 2. Create and Activate a Virtual Environment
 ```bash
-python3 -m venv z_venv
-source z_venv/bin/activate
+python3 -m venv my_venv
+source my_venv/bin/activate
 ```
 
-### 3. Install Python Dependencies
+#### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Create the MySQL Database
+#### 4. Set Up the MySQL Database
 ```bash
 mysql -u root -p
 ```
-Then inside the MySQL shell:
+Inside the MySQL shell:
 ```sql
 CREATE DATABASE mentorship_db;
 EXIT;
 ```
 
-### 5. Import Schema and Data
+#### 5. Import the Schema and Demo Data
 ```bash
 mysql -u root -p mentorship_db < sql/mentorship_db_backup.sql
 ```
 
-### 6. Run the App
+#### 6. Launch the App
 ```bash
 python app.py
 ```
 
-Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
+Now visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 
 ---
 
-## Notes
-- Your virtual environment (`z_venv/`) should **not be submitted**
-- All profile data and logic is already included in the backup
-- Search logic is built for accurate multi-field and checkbox filtering
+## 📂 Project Structure
+
+```
+📁 mentorship_database/
+├── app.py
+├── config.py
+├── templates/
+│   ├── home.html
+│   ├── create_profile.html
+│   ├── edit_profile.html
+│   └── ...
+├── static/
+│   ├── ER_diagram.png
+│   └── uploads/
+├── sql/
+│   ├── mentorship_db_backup.sql
+├── requirements.txt
+└── README.md
+```
 
 ---
 
-## Demo Tips
-- Create a “live demo” user (`live.demo@email.com`) during your presentation
-- Update that profile to show the edit functionality
-- Delete it at the end to complete the loop
+## ✅ Final Notes
 
----
+- All dummy profiles and field/interest options are already included in the backup SQL
+- Interest matching, flexible filtering, and email-based updates are fully implemented
+- This project highlights a working end-to-end database application with web integration
+
