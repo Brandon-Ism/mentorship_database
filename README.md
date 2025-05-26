@@ -25,7 +25,7 @@ Built using **Flask**, **MySQL**, and **HTML/CSS**, this project was completed a
 
 Here's what the profile table looks like in action:
 
-![Homepage Screenshot](static/homepage_screenshot.png)
+![Homepage Screenshot](static/homepage.png)
 
 ---
 
