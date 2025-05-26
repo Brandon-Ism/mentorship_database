@@ -21,6 +21,15 @@ Built using **Flask**, **MySQL**, and **HTML/CSS**, this project was completed a
 
 ---
 
+## 🖼️ Homepage Preview
+
+Here's what the profile table looks like in action:
+
+![Homepage Screenshot](static/homepage_screenshot.png)
+
+---
+
+
 ## ER Diagram
 
 Below is the core database design, normalized to 3NF with clean many-to-many relationships:
