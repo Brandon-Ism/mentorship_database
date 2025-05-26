@@ -98,6 +98,9 @@ Now visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 📁 mentorship_database/
 ├── app.py
 ├── config.py
+├── docs/
+│   ├── report.pdf
+│   ├── slide_deck.pdf
 ├── templates/
 │   ├── home.html
 │   ├── create_profile.html
@@ -105,9 +108,11 @@ Now visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 │   └── ...
 ├── static/
 │   ├── ER_diagram.png
+│   ├── homepage.png
 │   └── uploads/
 ├── sql/
 │   ├── mentorship_db_backup.sql
+│   └── schema.sql
 ├── requirements.txt
 └── README.md
 ```
