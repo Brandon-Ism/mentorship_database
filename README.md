@@ -2,7 +2,7 @@
 
 A clean, web-based platform that allows students, faculty, and researchers to create academic profiles, search for others by research interest or mentorship intent, and connect for collaboration.
 
-Built using **Flask**, **MySQL**, and **HTML/CSS**, this project was completed as part of a database design course and demonstrates a fully functional CRUD+Search system backed by a normalized relational schema.
+Built using **Flask**, **MySQL**, and **HTML**, this project was completed as part of a database design course and demonstrates a fully functional CRUD+Search system backed by a normalized relational schema.
 
 ---
 
